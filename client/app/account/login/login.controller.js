@@ -1,12 +1,13 @@
 'use strict';
 
 class LoginController {
-  constructor(Auth, $state) {
+  constructor(Auth, $state, socket) {
     this.user = {};
     this.errors = {};
     this.submitted = false;
 
     this.Auth = Auth;
+    this.socket = socket;
     this.$state = $state;
   }
 
@@ -20,6 +21,7 @@ class LoginController {
       })
       .then(() => {
         // Logged in, redirect to home
+        this.socket.authenticate();
         this.$state.go('main');
       })
       .catch(err => {

@@ -2,7 +2,7 @@
 'use strict';
 
 angular.module('openDoorsApp')
-  .factory('socket', function(socketFactory) {
+  .factory('socket', function(socketFactory, Auth) {
     // socket.io now auto-configures its connection when we ommit a connection url
     var ioSocket = io('', {
       // Send auth token on connection, you will need to DI the Auth service above
@@ -11,6 +11,10 @@ angular.module('openDoorsApp')
     });
 
     var socket = socketFactory({ ioSocket });
+
+    if(!!Auth.getToken()) {
+      ioSocket.emit('authenticate', {token:Auth.getToken()});
+    }
 
     return {
       socket,
@@ -66,6 +70,10 @@ angular.module('openDoorsApp')
       unsyncUpdates(modelName) {
         socket.removeAllListeners(modelName + ':save');
         socket.removeAllListeners(modelName + ':remove');
+      },
+
+      authenticate() {
+        socket.emit('authenticate', {token:Auth.getToken()});
       }
     };
   });
