@@ -5,11 +5,16 @@
 'use strict';
 
 import DeviceEvents from './device.events';
+import SocketContoller from './device.socket.controller';
 
 // Model events to emit
-var events = ['save', 'remove'];
+var unauthenticatedEvents = [];
+var authenticatedEvents = ['save', 'remove'];
+var unauthenticatedListeners = [{event: 'register', callback: SocketContoller.register}];
+var authenticatedListeners = [];
 
-export function register(socket) {
+export function register(socket, events) {
+  events = events || unauthenticatedEvents;
   // Bind model events to socket events
   for (var i = 0, eventsLength = events.length; i < eventsLength; i++) {
     var event = events[i];
@@ -20,6 +25,20 @@ export function register(socket) {
   }
 }
 
+export function registerAuthenticated(socket) {
+  register(socket, authenticatedEvents);
+}
+
+export function registerListeners(socket, listeners) {
+  listeners = listeners || unauthenticatedListeners;
+  for(var {event, callback} of listeners) {
+      socket.on('device:' + event, callback);
+  }
+}
+
+export function registerAuthenticatedListeners(socket) {
+  registerListeners(socket, authenticatedListeners);
+}
 
 function createListener(event, socket) {
   return function(doc) {

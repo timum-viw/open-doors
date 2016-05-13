@@ -18,11 +18,14 @@ function onConnect(socket) {
 
   // Insert sockets below
   require('../api/device/device.socket').register(socket);
+  require('../api/device/device.socket').registerListeners(socket);
   require('../api/thing/thing.socket').register(socket);
 
 }
 
 function onAuthenticated(socket) {
+  require('../api/device/device.socket').registerAuthenticated(socket);
+  require('../api/device/device.socket').registerAuthenticatedListeners(socket);
 }
 
 export default function(socketio) {
