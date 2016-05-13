@@ -10,11 +10,8 @@ div.navbar.navbar-default.navbar-static-top(ng-controller='NavbarController')
 
     div#navbar-main.navbar-collapse.collapse(uib-collapse='nav.isCollapsed')
       ul.nav.navbar-nav
-        li(ng-repeat='item in nav.menu', ui-sref-active='active')
+        li(ng-repeat='item in nav.menu | filter:nav.showMenuItem()', ui-sref-active='active')
           a(ui-sref='{{item.state}}') {{item.title}}
-
-        li(ng-show='nav.isAdmin()', ui-sref-active='active')
-          a(ui-sref='admin') Admin
 
       ul.nav.navbar-nav.navbar-right
         li(ng-hide='nav.isLoggedIn()', ui-sref-active='active')
