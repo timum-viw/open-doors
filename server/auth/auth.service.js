@@ -79,3 +79,7 @@ export function setTokenCookie(req, res) {
   res.cookie('token', token);
   res.redirect('/');
 }
+
+export function getDeviceToken() {
+  return require('crypto').randomBytes(256).toString('base64');
+}

@@ -32,7 +32,7 @@ export function registerAuthenticated(socket) {
 export function registerListeners(socket, listeners) {
   listeners = listeners || unauthenticatedListeners;
   for(var {event, callback} of listeners) {
-      socket.on('device:' + event, callback);
+      socket.on('device:' + event, callback.bind(this, socket));
   }
 }
 

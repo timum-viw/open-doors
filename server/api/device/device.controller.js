@@ -42,6 +42,15 @@ function removeEntity(res) {
   };
 }
 
+function acceptEntity(res) {
+  return function(entity) {
+    if (entity) {
+      entity.accept();
+      res.status(200).end();
+    }
+  };
+}
+
 function handleEntityNotFound(res) {
   return function(entity) {
     if (!entity) {
@@ -61,14 +70,14 @@ function handleError(res, statusCode) {
 
 // Gets a list of Devices
 export function index(req, res) {
-  return Device.find().exec()
+  return Device.find({},'-authToken').exec()
     .then(respondWithResult(res))
     .catch(handleError(res));
 }
 
 // Gets a single Device from the DB
 export function show(req, res) {
-  return Device.findById(req.params.id).exec()
+  return Device.findById(req.params.id, '-authToken').exec()
     .then(handleEntityNotFound(res))
     .then(respondWithResult(res))
     .catch(handleError(res));
@@ -86,7 +95,7 @@ export function update(req, res) {
   if (req.body._id) {
     delete req.body._id;
   }
-  return Device.findById(req.params.id).exec()
+  return Device.findById(req.params.id, '-authToken').exec()
     .then(handleEntityNotFound(res))
     .then(saveUpdates(req.body))
     .then(respondWithResult(res))
@@ -98,5 +107,12 @@ export function destroy(req, res) {
   return Device.findById(req.params.id).exec()
     .then(handleEntityNotFound(res))
     .then(removeEntity(res))
+    .catch(handleError(res));
+}
+
+export function accept(req, res) {
+  return Device.findById(req.params.id).exec()
+    .then(handleEntityNotFound(res))
+    .then(acceptEntity(res))
     .catch(handleError(res));
 }

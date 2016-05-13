@@ -1,0 +1,17 @@
+div 
+  table.table
+    th id
+    th device
+    th cluster
+    th state
+    th
+    tr(ng-repeat='device in $ctrl.devices')
+      td {{device.deviceId}}
+      td {{device.name}}
+      td {{device.cluster.join(', ')}}
+      td {{device.state}}
+      td
+        a(ng-click='$ctrl.acceptDevice(device)', ng-show='device.state === "requested"') accept
+        a(ng-click='$ctrl.removeDevice(device)')
+          i.glyphicon.glyphicon-trash
+  button.btn-info.btn(ng-click='$ctrl.addDevice()') Add device
