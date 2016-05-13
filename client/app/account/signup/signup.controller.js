@@ -7,9 +7,10 @@ class SignupController {
   submitted = false;
   //end-non-standard
 
-  constructor(Auth, $state) {
+  constructor(Auth, $state, socket) {
     this.Auth = Auth;
     this.$state = $state;
+    this.socket = socket;
   }
 
   register(form) {
@@ -23,6 +24,7 @@ class SignupController {
       })
       .then(() => {
         // Account created, redirect to home
+        this.socket.authenticate();
         this.$state.go('main');
       })
       .catch(err => {
