@@ -4,12 +4,14 @@ div
     th device
     th cluster
     th state
+    th online
     th
     tr(ng-repeat='device in $ctrl.devices')
       td {{device.deviceId}}
       td {{device.name}}
       td {{device.cluster.join(', ')}}
       td {{device.state}}
+      td {{device.online}}
       td
         a(ng-click='$ctrl.acceptDevice(device)', ng-show='device.state === "requested"') accept
         a(ng-click='$ctrl.removeDevice(device)')

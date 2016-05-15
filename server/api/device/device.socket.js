@@ -51,3 +51,9 @@ function removeListener(event, listener) {
     DeviceEvents.removeListener(event, listener);
   };
 }
+
+export function onDisconnect(socket) {
+  if(socket.deviceId) {
+    SocketContoller.goOffline(socket.deviceId);
+  }
+}

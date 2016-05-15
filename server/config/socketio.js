@@ -7,6 +7,7 @@ import config from './environment';
 
 // When the user disconnects.. perform this
 function onDisconnect(socket) {
+  require('../api/device/device.socket').onDisconnect(socket);
 }
 
 // When the user connects.. perform this

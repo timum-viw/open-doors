@@ -2,7 +2,6 @@
 
 import _ from 'lodash';
 import Device from './device.model';
-import {getDeviceToken} from '../../auth/auth.service';
 import DeviceEvents from './device.events';
 
 function handleError(err) {
@@ -27,31 +26,40 @@ function create(device) {
 
 export default {
   register(socket, device) {
-    if(!device.deviceId) {
-      handleError('Can\'t register device without deviceId');
-      return;
-    }
 
-    function registerAccept() {
-      DeviceEvents.once('accept:' + device.deviceId, (data) => {
+    function registerAccept(deviceId) {
+      DeviceEvents.once('accept:' + deviceId, (data) => {
+        socket.authenticated = true;
         socket.emit('device:accept', data);
       });
     }
 
-    Device.findOne({ 'deviceId': device.deviceId }, function (err, dbDevice) {
-      if (err) return handleError(err);
-      if (!dbDevice) {
-        create({deviceId: device.deviceId, state:'requested', authToken:getDeviceToken()});
-        registerAccept();
-      } else {
-        if(!device.authToken) {
-          return;
-        } else {
-          if(device.authToken === dbDevice.authToken) {
-            registerAccept();
-            dbDevice.accept();
-          }
+    if(device && device.deviceId && device.authToken) {
+      Device.findById(device.deviceId, (err, dbDevice) => {
+        if (err) return handleError(err);
+        if(device.authToken === dbDevice.authToken) {
+          registerAccept(device.deviceId);
+          socket.deviceId = device.deviceId;
+          dbDevice.accept();
         }
+      });
+    } else if(!device) {
+      create({online: true, state:'requested'})
+        .then((device) => {
+          socket.deviceId = device._id;
+          registerAccept(device._id);
+        });
+    }
+  },
+
+  goOffline(deviceId) {
+    Device.findById(deviceId, (err, dbDevice) => {
+      if (err) return handleError(err);
+      dbDevice.online = false;
+      if(dbDevice.state !== 'accepted') {
+        dbDevice.remove();
+      } else {
+        dbDevice.save();
       }
     });
   }

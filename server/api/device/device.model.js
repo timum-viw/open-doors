@@ -2,12 +2,13 @@
 
 import mongoose from 'mongoose';
 import DeviceEvents from './device.events';
+import {getDeviceToken} from '../../auth/auth.service';
 
 var DeviceSchema = new mongoose.Schema({
   name: String,
   info: String,
-  deviceId: String,
   state: String,
+  online: Boolean,
   cluster: Array,
   authToken: String,
   keys: Array,
@@ -33,8 +34,10 @@ for (var e in DeviceEvents.events) {
 DeviceSchema.methods = {
   accept() {
     this.state = 'accepted';
+    this.online = true;
+    this.authToken = getDeviceToken();
     this.save().then(entity => {
-      DeviceEvents.emit('accept:' + entity.deviceId, {authToken: entity.authToken});
+      DeviceEvents.emit('accept:' + entity._id, {deviceId: entity._id, authToken: entity.authToken});
     });
   }
 };
