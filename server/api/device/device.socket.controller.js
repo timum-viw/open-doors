@@ -1,6 +1,5 @@
 'use strict';
 
-import _ from 'lodash';
 import Device from './device.model';
 import DeviceEvents from './device.events';
 
@@ -28,16 +27,20 @@ export default {
   register(socket, device) {
 
     function registerAccept(deviceId) {
-      DeviceEvents.once('accept:' + deviceId, (data) => {
+      var listener = (data) => {
         socket.authenticated = true;
         socket.emit('device:accept', data);
+      };
+      DeviceEvents.once('accept:' + deviceId, listener);
+      socket.on('disconnect', () => {
+        DeviceEvents.removeListener('accept:' + deviceId, listener);
       });
     }
 
     if(device && device.deviceId && device.authToken) {
       Device.findById(device.deviceId, (err, dbDevice) => {
         if (err) return handleError(err);
-        if(device.authToken === dbDevice.authToken) {
+        if(dbDevice && dbDevice.state === 'accepted' && device.authToken === dbDevice.authToken) {
           registerAccept(device.deviceId);
           socket.deviceId = device.deviceId;
           dbDevice.accept();
@@ -62,5 +65,14 @@ export default {
         dbDevice.save();
       }
     });
+  },
+
+  command(socket, data) {
+    if(socket.deviceId && socket.authenticated) {
+      Device.findById(deviceId, (err, device) => {
+        if (err) return handleError(err);
+        DeviceEvents.emit('command:' + data.target, data.payload);
+      });
+    }
   }
 }

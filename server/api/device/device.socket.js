@@ -10,7 +10,8 @@ import SocketContoller from './device.socket.controller';
 // Model events to emit
 var unauthenticatedEvents = [];
 var authenticatedEvents = ['save', 'remove'];
-var unauthenticatedListeners = [{event: 'register', callback: SocketContoller.register}];
+var unauthenticatedListeners = [{event: 'register', callback: SocketContoller.register},
+                                {event: 'command', callback: SocketContoller.command}];
 var authenticatedListeners = [];
 
 export function register(socket, events) {
