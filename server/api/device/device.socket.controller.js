@@ -23,34 +23,37 @@ function create(device) {
     .catch(handleError);
 };
 
+function registerAccept(device) {
+  var accepted = (data) => {
+    socket.authenticated = true;
+    for(var tag of device.cluster) {
+      socket.join(tag);
+    }
+    socket.join(device._id);
+    socket.emit('device:accept', data);
+  };
+  DeviceEvents.once('accept:' + device._id, accepted);
+  socket.on('disconnect', () => {
+    DeviceEvents.removeListener('accept:' + device._id, accepted);
+  });
+};
+
 export default {
   register(socket, device) {
-
-    function registerAccept(deviceId) {
-      var listener = (data) => {
-        socket.authenticated = true;
-        socket.emit('device:accept', data);
-      };
-      DeviceEvents.once('accept:' + deviceId, listener);
-      socket.on('disconnect', () => {
-        DeviceEvents.removeListener('accept:' + deviceId, listener);
-      });
-    }
-
     if(device && device.deviceId && device.authToken) {
       Device.findById(device.deviceId, (err, dbDevice) => {
         if (err) return handleError(err);
         if(dbDevice && dbDevice.state === 'accepted' && device.authToken === dbDevice.authToken) {
-          registerAccept(device.deviceId);
-          socket.deviceId = device.deviceId;
+          registerAccept(dbDevice);
+          socket.deviceId = dbDevice._id;
           dbDevice.accept();
         }
       });
     } else if(!device) {
-      create({online: true, state:'requested'})
+      create({online: true, state:'requested', cluster:['all']})
         .then((device) => {
           socket.deviceId = device._id;
-          registerAccept(device._id);
+          registerAccept(device);
         });
     }
   },
@@ -58,6 +61,7 @@ export default {
   goOffline(deviceId) {
     Device.findById(deviceId, (err, dbDevice) => {
       if (err) return handleError(err);
+      if (!dbDevice) return;
       dbDevice.online = false;
       if(dbDevice.state !== 'accepted') {
         dbDevice.remove();
@@ -69,9 +73,10 @@ export default {
 
   command(socket, data) {
     if(socket.deviceId && socket.authenticated) {
-      Device.findById(deviceId, (err, device) => {
+      Device.findById(socket.deviceId, (err, device) => {
         if (err) return handleError(err);
-        DeviceEvents.emit('command:' + data.target, data.payload);
+        if (!device) return;
+        socket.to(data.target).emit('device:command', data.payload);
       });
     }
   }

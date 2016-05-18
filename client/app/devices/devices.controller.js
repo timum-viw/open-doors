@@ -22,10 +22,6 @@ class DevicesComponent {
     });
   }
 
-  addDevice() {
-    this.socket.socket.emit('device:register', JSON.parse(window.localStorage.getItem('device')));
-  }
-
   acceptDevice(device) {
     this.$http.put('/api/devices/' + device._id + '/accept');
   }
