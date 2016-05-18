@@ -26,9 +26,6 @@ function create(device) {
 function registerAccept(device, socket) {
   var accepted = (data) => {
     socket.authenticated = true;
-    for(var tag of device.cluster) {
-      socket.join(tag);
-    }
     socket.join(device._id);
     socket.emit('device:accept', data);
   };
@@ -76,7 +73,12 @@ export default {
       Device.findById(socket.deviceId, (err, device) => {
         if (err) return handleError(err);
         if (!device) return;
-        socket.to(data.target).emit('device:command', data.payload);
+        socket.to(data.target).emit('device:command', data.payload);;
+        Device.find({cluster: data.target}, (err, devices) => {
+          for(var device of devices) {
+            socket.to(device._id).emit('device:command', data.payload);
+          }
+        });
       });
     }
   }
