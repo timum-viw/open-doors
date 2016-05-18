@@ -53,7 +53,7 @@ export default {
       create({online: true, state:'requested', cluster:['all']})
         .then((device) => {
           socket.deviceId = device._id;
-          registerAccept(device);
+          registerAccept(device, socket);
         });
     }
   },
