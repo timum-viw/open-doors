@@ -23,7 +23,7 @@ function create(device) {
     .catch(handleError);
 };
 
-function registerAccept(device) {
+function registerAccept(device, socket) {
   var accepted = (data) => {
     socket.authenticated = true;
     for(var tag of device.cluster) {
@@ -44,7 +44,7 @@ export default {
       Device.findById(device.deviceId, (err, dbDevice) => {
         if (err) return handleError(err);
         if(dbDevice && dbDevice.state === 'accepted' && device.authToken === dbDevice.authToken) {
-          registerAccept(dbDevice);
+          registerAccept(dbDevice, socket);
           socket.deviceId = dbDevice._id;
           dbDevice.accept();
         }
