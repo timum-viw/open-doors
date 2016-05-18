@@ -44,10 +44,12 @@ export default {
           registerAccept(dbDevice, socket);
           socket.deviceId = dbDevice._id;
           dbDevice.accept();
+        } else {
+          socket.emit('device:reject');
         }
       });
     } else if(!device) {
-      create({online: true, state:'requested', cluster:['all']})
+      create({online: true, state:'requested'})
         .then((device) => {
           socket.deviceId = device._id;
           registerAccept(device, socket);
