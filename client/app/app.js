@@ -10,6 +10,7 @@ angular.module('openDoorsApp', [
   'btford.socket-io',
   'ui.router',
   'ui.bootstrap',
+  'ui.select',
   'validation.match'
 ])
   .config(function($urlRouterProvider, $locationProvider) {

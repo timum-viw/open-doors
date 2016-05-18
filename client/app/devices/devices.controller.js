@@ -13,13 +13,19 @@ class DevicesComponent {
   }
 
   $onInit() {
-    this.socket.socket.on('device:accept', (data) => {
-      window.localStorage.setItem('device', JSON.stringify(data));
-    });
     this.$http.get('/api/devices').then(response => {
       this.devices = response.data;
       this.socket.syncUpdates('device', this.devices);
     });
+  }
+
+  getClusters() {
+    return this.devices.map((device) => {return device.cluster;})
+            .reduce((result, cluster) => {return result.concat(cluster);});
+  }
+
+  save(device) {
+    this.$http.put('/api/devices/' + device._id, device);
   }
 
   acceptDevice(device) {

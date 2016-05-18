@@ -1,18 +1,35 @@
-div 
+div(ng-init="$ctrl.tags = []")
+  h3 Accepted Devices
   table.table
     th id
     th device
     th cluster
-    th state
     th online
     th
-    tr(ng-repeat='device in $ctrl.devices')
-      td {{device.deviceId}}
+    tr(ng-repeat-start='device in $ctrl.devices | filter:{state:"accepted"}')
+      td 
+        a.btn(style='padding:0', ng-click='$ctrl.row === $index ? $ctrl.row = undefined : $ctrl.row = $index') {{device._id}}
       td {{device.name}}
-      td {{device.cluster.join(', ')}}
-      td {{device.state}}
+      td
+        ui-select(style="max-width:250px", multiple, tagging, tagging-label="" ng-model="device.cluster", on-remove="$ctrl.save(device)", on-select="$ctrl.save(device)")
+          ui-select-match(placeholder="Add tags...") {{$item}}
+          ui-select-choices(repeat="tag in $ctrl.getClusters() | filter:$select.search") 
+            div {{tag}}
       td {{device.online}}
       td
-        a(ng-click='$ctrl.acceptDevice(device)', ng-show='device.state === "requested"') accept
-        a(ng-click='$ctrl.removeDevice(device)')
+        a.btn(style='padding:0', ng-click='$ctrl.removeDevice(device)')
           i.glyphicon.glyphicon-trash
+    tr(ng-repeat-end, ng-show='$ctrl.row === $index')
+      td(colspan='5') haloo!
+div
+  h3 Open Requests
+  table.table
+    th id
+    th device
+    th
+    tr(ng-repeat='device in $ctrl.devices | filter:{state:"requested"}')
+      td {{device._id}}
+      td {{device.name}}
+      td
+        a.btn(style='padding:0', ng-click='$ctrl.acceptDevice(device)')
+          i.glyphicon.glyphicon-ok
