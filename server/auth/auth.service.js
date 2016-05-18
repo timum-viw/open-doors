@@ -81,5 +81,5 @@ export function setTokenCookie(req, res) {
 }
 
 export function getDeviceToken() {
-  return require('crypto').randomBytes(256).toString('base64');
+  return require('crypto').randomBytes(192).toString('base64');
 }
