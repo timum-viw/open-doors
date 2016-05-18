@@ -23,10 +23,10 @@ function respondWithResult(res, statusCode) {
 
 function saveUpdates(updates) {
   return function(entity) {
-    var updated = _.merge(entity, updates);
-    return updated.save()
-      .then(updated => {
-        return updated;
+    _.extend(entity, updates);
+    return entity.save()
+      .then(entity => {
+        return entity;
       });
   };
 }
