@@ -35,7 +35,8 @@ DeviceSchema.methods = {
   accept() {
     this.state = 'accepted';
     this.online = true;
-    this.authToken = getDeviceToken();
+    //TODO: work this out!! 
+    //this.authToken = getDeviceToken();
     this.save().then(entity => {
       DeviceEvents.emit('accept:' + entity._id, {deviceId: entity._id, authToken: entity.authToken});
     });
