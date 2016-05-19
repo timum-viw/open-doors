@@ -2,6 +2,7 @@
 
 import Device from './device.model';
 import DeviceEvents from './device.events';
+import {getDeviceToken} from '../../auth/auth.service';
 
 function handleError(err) {
   console.error(err);
@@ -59,7 +60,7 @@ export default {
         }
       });
     } else if(!device) {
-      create({online: true, state:'requested'})
+      create({online: true, state:'requested', authToken: getDeviceToken()})
         .then((device) => {
           socket.deviceId = device._id;
           registerAccept(device, socket);
