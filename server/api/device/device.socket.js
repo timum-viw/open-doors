@@ -11,7 +11,8 @@ import SocketContoller from './device.socket.controller';
 var unauthenticatedEvents = [];
 var authenticatedEvents = ['save', 'remove'];
 var unauthenticatedListeners = [{event: 'register', callback: SocketContoller.register},
-                                {event: 'command', callback: SocketContoller.command}];
+                                {event: 'command', callback: SocketContoller.command},
+                                {event: 'list', callback: SocketContoller.list}];
 var authenticatedListeners = [];
 
 export function register(socket, events) {

@@ -36,6 +36,16 @@ function registerAccept(device, socket) {
 };
 
 export default {
+  list(socket) {
+    if(socket.deviceId && socket.authenticated) {
+      Device.find({_id:{'$ne':socket.deviceId},state:'accepted'}, '-authToken', (err, devices) => {
+        if (err) return handleError(err);
+        if (!devices) return;
+        socket.emit('device:list', devices);;
+      });
+    }
+  },
+
   register(socket, device) {
     if(device && device.deviceId && device.authToken) {
       Device.findById(device.deviceId, (err, dbDevice) => {
