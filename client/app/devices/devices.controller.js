@@ -20,8 +20,8 @@ class DevicesComponent {
   }
 
   getClusters() {
-    return this.devices.map((device) => {return device.cluster;})
-            .reduce((result, cluster) => {return result.concat(cluster);});
+    return Array.from(new Set(this.devices.map((device) => {return device.cluster;})
+            .reduce((result, cluster) => {return result.concat(cluster);})));
   }
 
   save(device) {
